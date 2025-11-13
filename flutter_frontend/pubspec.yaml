@@ -38,6 +38,12 @@ dependencies:
   shared_preferences: ^2.2.2
   intl: ^0.19.0
   cupertino_icons: ^1.0.8
+  # Newly added packages for security, file handling, sharing, and storage
+  local_auth: ^2.3.0
+  flutter_secure_storage: ^9.2.2
+  file_picker: ^8.1.7
+  share_plus: ^10.1.1
+  path_provider: ^2.1.5
 
 dev_dependencies:
   flutter_test:

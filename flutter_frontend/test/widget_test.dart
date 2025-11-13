@@ -28,13 +28,14 @@ void main() {
   testWidgets('App boots to /home route', (WidgetTester tester) async {
     final app = await buildApp(initialRoute: '/home');
     await tester.pumpWidget(app);
-    // Expect our placeholder Home screen text to be visible
-    expect(find.text('Home - Folders Overview'), findsOneWidget);
+    // Expect our Home app bar title to be visible
+    expect(find.text('Your Folders'), findsOneWidget);
   });
 
   testWidgets('App boots to /lock route', (WidgetTester tester) async {
     final app = await buildApp(initialRoute: '/lock');
     await tester.pumpWidget(app);
-    expect(find.text('Locked - authenticate to continue'), findsOneWidget);
+    // The LockScreen app bar title is 'Set your PIN' for setup flow or 'Unlock Wallet' if configured.
+    expect(find.text('Unlock Wallet'), findsAny);
   });
 }

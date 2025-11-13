@@ -49,6 +49,8 @@ dependencies:
   crypto: ^3.0.3
   mime: ^2.0.0
   open_filex: ^4.5.0
+  # Needed for cross-platform save/open dialogs and XFile/XTypeGroup APIs
+  file_selector: ^1.0.3
 
 dev_dependencies:
   flutter_test:

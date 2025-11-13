@@ -1,5 +1,12 @@
 # This is a generated file; do not edit or check into version control.
 file_picker=/home/kavia/.pub-cache/hosted/pub.dev/file_picker-8.3.7/
+file_selector=/home/kavia/.pub-cache/hosted/pub.dev/file_selector-1.0.4/
+file_selector_android=/home/kavia/.pub-cache/hosted/pub.dev/file_selector_android-0.5.1+17/
+file_selector_ios=/home/kavia/.pub-cache/hosted/pub.dev/file_selector_ios-0.5.3+2/
+file_selector_linux=/home/kavia/.pub-cache/hosted/pub.dev/file_selector_linux-0.9.3+2/
+file_selector_macos=/home/kavia/.pub-cache/hosted/pub.dev/file_selector_macos-0.9.4+4/
+file_selector_web=/home/kavia/.pub-cache/hosted/pub.dev/file_selector_web-0.9.4+2/
+file_selector_windows=/home/kavia/.pub-cache/hosted/pub.dev/file_selector_windows-0.9.3+4/
 flutter_plugin_android_lifecycle=/home/kavia/.pub-cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.31/
 flutter_secure_storage=/home/kavia/.pub-cache/hosted/pub.dev/flutter_secure_storage-9.2.4/
 flutter_secure_storage_linux=/home/kavia/.pub-cache/hosted/pub.dev/flutter_secure_storage_linux-1.2.3/

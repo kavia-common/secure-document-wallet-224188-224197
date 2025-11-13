@@ -1,168 +1,165 @@
-# Secure Document Wallet - Manual QA Checklist
+# Manual QA - Flutter Offline-first Document Wallet
 
-This document guides a full manual verification on the running preview (Appetize or device).
+This checklist guides a manual preview verification run on the Appetize or local emulator build. It focuses on critical user flows: lock security, folder/document management, file import/preview/share/delete, and offline persistence behavior.
 
-Environment:
-- Container: flutter_frontend
-- Preview URL (from runner): https://appetize.io/embed/m7wc6r35jhcphze6sfq6vyn3be
+Run target:
+- Environment: Appetize embed or Android/iOS emulator
+- Build: flutter_frontend (current workspace)
 
-Device Permissions:
-- Files/Media Access (for file picker)
-- Biometrics (if available)
-- Local storage (DB persistence)
+Preconditions:
+- Fresh install scenario: App may not have lock configured.
+- Storage permission will be requested on first file import/share where applicable.
 
-Record for each step:
-- Expected Result
-- Actual Result
-- Errors/Prompts
-- Notes
+Test Data:
+- Use any 2–3 small PDF/PNG/JPEG/TXT files from device/emulator storage (e.g., Downloads).
 
-Sections:
-1. App Launch & Lock Setup
-2. Unlock (PIN & Biometric)
-3. Folder Management
-4. Import Documents via File Picker
-5. Open/Preview Documents
-6. Share a Document
-7. Delete a Document
-8. Persistence Across Restarts
-9. General Observations
+1) App Launch and First-run
+- Action: Launch the app.
+- Expected:
+  - Shows Lock screen on first launch with options to set up biometric/PIN (per app design).
+  - If biometric available: Prompt from OS. If not: fallback PIN setup.
+  - No crash or red-screen errors.
+- Capture:
+  - Note any permission/OS prompts.
+  - Errors in console logs (if running locally: flutter run).
 
----
+2) Lock Setup (Biometric or PIN)
+- Action:
+  - If biometric available, enable biometric unlock.
+  - Otherwise set a PIN (record a test PIN for verification).
+- Expected:
+  - Setup completes and user is navigated to Home screen.
+  - Subsequent app open requires unlock (biometric/PIN).
+- Capture:
+  - Any errors from local_auth_service or secure_storage_service.
+  - Any repeated prompts or failures to enroll.
 
-1) App Launch & Lock Setup
-Steps:
-- Launch the app in Appetize.
-- On first run, you should see a lock setup flow (PIN entry). If biometrics are supported, an option should appear.
-- Create a 4-6 digit PIN, confirm it.
+3) Unlock Flow Verification
+- Action:
+  - Lock the app (send to background) and reopen.
+  - Provide biometric/PIN.
+- Expected:
+  - Successful unlock returns to Home screen without resetting state.
+- Negative:
+  - Enter wrong PIN once.
+- Expected:
+  - Friendly error message, no crash.
+- Capture:
+  - Errors, unexpected retries, or session resets.
 
-Expected:
-- App accepts a valid PIN and stores it securely (no crash).
-- If biometric is available, toggle/enable it after PIN creation (optional).
+4) Folder Creation
+- Action:
+  - Create folders: "Personal", "Work".
+- Expected:
+  - Folders appear in Home list with correct names.
+  - No duplicates unless explicitly created.
+- Capture:
+  - Errors from folder_repository or app_database writes.
 
-Record:
-- Any permission prompts (biometric prompt).
-- Errors in lock service.
+5) Document Import via File Picker
+- Action:
+  - Open "Personal" folder.
+  - Import files using Floating Action Button or upload action.
+  - Choose 2 files with different types (e.g., PDF and PNG).
+- Expected:
+  - OS file picker permission prompt may appear (Android READ/WRITE or scoped storage).
+  - On acceptance, documents are added and listed with filenames and metadata.
+- Capture:
+  - Permission prompts and outcomes.
+  - Errors from file_service or document_repository.
+  - Thumbnails/icon rendering behavior.
 
-2) Unlock (PIN & Biometric)
-Steps:
-- Lock screen should be shown after app relaunch.
-- Try unlocking with PIN.
-- If biometric enabled, attempt biometric unlock.
+6) Document Preview
+- Action:
+  - Tap each imported document to open its preview screen.
+- Expected:
+  - Document content or a default preview placeholder loads without crash.
+  - Back navigation returns to folder list.
+- Capture:
+  - Preview errors (e.g., unsupported type), timeouts, or blank view.
 
-Expected:
-- PIN unlock succeeds with correct PIN; fails with incorrect PIN with friendly error.
-- Biometric prompt appears and succeeds/fails cleanly.
+7) Share a Document
+- Action:
+  - From document tile or document view screen, use Share action.
+- Expected:
+  - OS share sheet opens with available share targets.
+  - No crash; canceling returns to the app.
+- Capture:
+  - Share permission prompts, errors from share_service/share_utils.
 
-Record:
-- Messages on wrong PIN.
-- Biometric availability prompt status.
+8) Delete a Document
+- Action:
+  - Delete one imported document from the folder.
+- Expected:
+  - Confirmation (if implemented), then document disappears from list.
+  - No orphaned UI tiles or errors.
+- Capture:
+  - Errors from document_repository or app_database delete operations.
 
-3) Folder Management
-Steps:
-- From Home, create a folder (“Personal”).
-- Create another folder (“Work”).
-- Rename a folder (if supported).
-- Open a folder to view its empty state.
+9) Persistence Across App Restart (Offline-first)
+- Action:
+  - Fully close and relaunch the app.
+  - Unlock via biometric/PIN.
+- Expected:
+  - Folders and remaining documents persist and display correctly.
+  - No re-import required; offline storage backed by app_database is intact.
+- Capture:
+  - Any data loss, ordering changes, or reindexing delay anomalies.
 
-Expected:
-- New folders appear in list.
-- Empty folder shows an empty state UI without errors.
+10) Edge Permissions
+- Action:
+  - Deny file picker permission once; retry import.
+- Expected:
+  - App shows a rationale/toast and allows retry or directs to Settings.
+- Capture:
+  - Behavior on denial and recovery path.
 
-Record:
-- Any validation messages (duplicate name, empty name).
-- UI refresh behavior.
+11) General UX/Performance Notes
+- Observe:
+  - Animation smoothness, load times, freezes.
+  - Error messages clarity, empty states (ui/widgets/empty_state.dart).
+- Capture:
+  - Suggestions for improvement.
 
-4) Import Documents via File Picker
-Steps:
-- Enter “Personal” folder.
-- Use “Add/Upload” or Floating Action Button to open File Picker.
-- Select a small PDF or image (use Appetize demo files if available).
-- Confirm import.
+Known Functional Areas in Codebase for Debugging:
+- Lock & Auth:
+  - lib/core/services/local_auth_service.dart
+  - lib/core/services/lock_service.dart
+  - lib/core/services/secure_storage_service.dart
+- Data & Repos:
+  - lib/data/db/app_database.dart
+  - lib/features/folders/repository/folder_repository.dart
+  - lib/features/documents/repository/document_repository.dart
+- Files & Sharing:
+  - lib/services/files/file_service.dart
+  - lib/services/files/share_service.dart
+  - lib/shared/utils/file_utils.dart
+  - lib/shared/utils/share_utils.dart
+- UI:
+  - lib/ui/screens/ (home, lock, folder detail, document view)
+  - lib/ui/widgets/ (document_tile, folder_tile, empty_state)
 
-Expected:
-- Permission prompt for storage may appear; grant it.
-- Document entry appears with name, type, and modified date.
-
-Record:
-- Permission prompts.
-- Any errors from file_service or repository.
-
-5) Open/Preview Documents
-Steps:
-- Tap on the imported document.
-- Preview should open (PDF viewer or image viewer).
-- Navigate back.
-
-Expected:
-- Document previews without crash.
-- Proper back navigation to folder list.
-
-Record:
-- Viewer performance, rendering errors.
-
-6) Share a Document
-Steps:
-- From document tile overflow or detail, select Share.
-- System share sheet should appear.
-
-Expected:
-- Share intent opens; canceling returns to app gracefully.
-
-Record:
-- Any errors from share_service.
-
-7) Delete a Document
-Steps:
-- From document tile options or detail, select Delete.
-- Confirm deletion.
-
-Expected:
-- Document removed from list.
-- No orphaned previews.
-
-Record:
-- Confirmation prompts and any errors.
-
-8) Persistence Across Restarts
-Steps:
-- Close the app session (restart Appetize).
-- Unlock with PIN or biometric.
-- Verify folders and documents still present.
-- Open a previously imported document to ensure it persists.
-
-Expected:
-- Data persists (folders/docs).
-- No re-import needed.
-
-Record:
-- Any missing items or DB issues.
-
-9) General Observations
-- Performance: scrolling, navigation latency.
-- UI consistency with style guide (light, modern, blue/cyan accents).
-- Error handling: friendly messages, no stack traces.
-- Security: no sensitive data in logs or UI.
-
----
-
-Runtime Error & Permission Prompt Log Template
-
+Runtime Issues Log Template:
 - Timestamp:
-- Step:
-- Component (lock_service, secure_storage_service, file_service, share_service, repositories):
-- Error message / prompt text:
+- Device/Emulator:
+- OS Version:
+- Scenario (Step number):
+- What happened:
+- Expected behavior:
 - Repro steps:
-- Screenshots (if possible):
-- Notes:
+- Screenshots/Logs:
 
----
+Pass/Fail Criteria:
+- All steps complete without unhandled exceptions or crashes.
+- Lock setup/unlock works reliably.
+- Folders/documents persist across restart.
+- File import/preview/share/delete behave per expectations.
+- Permissions handled gracefully with clear messaging.
 
-Known Limitations to Validate
-- File picker availability in Appetize may be limited; if not usable, test on device/emulator.
-- Biometric prompt may not be supported in Appetize; validate PIN unlock as primary.
-- Large files: out-of-scope; test small PDFs/images.
+Retest Guidance:
+- If a step fails due to permissions, reset app permissions and retry.
+- If document previews fail for specific types, note the MIME/type and attach sample file.
+- If data persistence fails, collect logs for app_database operations and repro after clean reinstall.
 
-Pass/Fail Criteria
-- All critical flows (setup/unlock, create folder, import small doc, view, share, delete, persistence) complete without crashes or blocking errors.
-- Permissions requested as needed and handled gracefully.
+Notes:
+- This document is intended for repeated manual verification and to capture findings during preview runs.

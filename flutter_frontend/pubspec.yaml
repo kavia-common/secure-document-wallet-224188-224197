@@ -27,7 +27,9 @@ dependencies:
   crypto: ^3.0.3
   mime: ^2.0.0
   open_filex: ^4.5.0
-  file_selector: ^1.0.3
+  # Use umbrella file_selector which brings in the correct platform implementations transitively.
+  # Pin to a known compatible version that supports getSavePath for Flutter 3.29.x.
+  file_selector: ^1.0.4
 
 dev_dependencies:
   flutter_test:

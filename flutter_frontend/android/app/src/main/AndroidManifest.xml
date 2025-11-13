@@ -6,13 +6,19 @@
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
 
     <!--
-      Note on storage permissions:
-      - This app uses Storage Access Framework (SAF) via file_picker and writes only to the
-        app's sandboxed documents directory (path_provider). Therefore, no broad storage
-        permissions (READ/WRITE_EXTERNAL_STORAGE) are requested here.
-      - If a legacy device (pre-Android 13) combined with specific plugin behavior requires
-        READ_EXTERNAL_STORAGE for certain flows, that should be conditionally added by
-        the plugin; we intentionally keep permissions minimal in the app manifest.
+      Storage & file access policy:
+      - We prefer SAF-first flows using file_picker and persist files only to the
+        app's sandboxed documents directory via path_provider.
+      - Therefore, NO broad storage permissions (READ/WRITE_EXTERNAL_STORAGE) are declared.
+      - On pre-Android 13 devices, file selection is handled by SAF/file chooser and
+        does not require READ_EXTERNAL_STORAGE for our use case.
+      - If a plugin ever requires additional permissions, those should be added by the plugin
+        itself or revisited with minimal scope. Keeping the manifest minimal by default.
+      
+      Plugin notes:
+      - local_auth: requires USE_BIOMETRIC (and legacy USE_FINGERPRINT) which are declared above.
+      - file_picker: uses SAF and does not need storage permissions in the app manifest.
+      - share_plus: shares via content URIs/intents, no extra permissions required here.
     -->
 
     <application

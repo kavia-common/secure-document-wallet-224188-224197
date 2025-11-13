@@ -48,6 +48,7 @@ dependencies:
   # Added to satisfy imports in lock_service and file_service
   crypto: ^3.0.3
   mime: ^2.0.0
+  open_filex: ^4.5.0
 
 dev_dependencies:
   flutter_test:
